@@ -1,0 +1,127 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+    <div class="row" style="padding-top: 15px;">
+        <div class="col-auto" style="padding-bottom: 7px;">
+            Please provide employee information to verify their identity:
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md">
+            <div class="form-floating">
+                <input type="upn" class="form-control" id="upn" name="upn" required placeholder="10@example.com">
+                <label for="upn">User principal name (UPN)</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="padding-top: 15px;">
+        <div class="col-md">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="phone" name="phone"  placeholder="+1 555-555-5555" required>
+                <label for="name">Phone number</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="padding-top: 15px;">
+        <div class="col-auto">
+            <button type="button" id="sendButton" class="btn btn-primary" style="width: 150px"><i class="bi bi-send"></i> Send</button>
+        </div>
+    </div>
+
+
+    <div id="errorMessageContainer" class="alert alert-danger text-start mt-5" style="display: none;" role="alert">
+        <h4 class="alert-heading">Error</h4>
+        <p id="errorMessage">
+
+        </p>
+    </div>
+
+    <div id="successMessageContainer" class="alert alert-success text-start mt-5" style="display: none;" role="alert">
+        <h4 class="alert-heading">The request has been submitted successfully</h4>
+        <p id="successMessage">
+        </p>
+    </div>
+
+    <div id="actionUrl" style="color: gray;" class="text-start">
+
+    </div>
+
+@section Scripts {
+        <script>
+
+        let statusCheckInterval;
+
+        function startStatusCheck(requestId) {
+            statusCheckInterval = setInterval(function() {
+                $.get('/api/request-status', { id: requestId })
+                    .done(function(response) {
+                        $("#successMessageContainer").show();
+                        $("#successMessage").text(response.message);
+
+                        // If we have a final status, stop checking
+                        if (response.status === "presentation_verified") {
+                            clearInterval(statusCheckInterval);
+                        }
+
+                    })
+                    .fail(function(xhr) {
+                        $("#errorMessageContainer").show();
+                        $("#errorMessage").text('Error checking status: ' + xhr.responseText);
+                        clearInterval(statusCheckInterval);
+                    });
+            }, 3000); // Check every 3 seconds
+        }
+
+            $(document).ready(function () {
+                $("#sendButton").click(function () {
+                    var upn = $("#upn").val();
+                    var phone = $("#phone").val();
+
+                    // Disable button while processing
+                    $("#sendButton").prop('disabled', true);
+                    $("#errorMessageContainer").hide();
+                    $("#errorMessage").text('');
+                    $("#successMessageContainer").hide();
+                    $("#successMessage").text('');
+
+                    $.ajax({
+                        url: '/api/verifier/presentation-request',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            upn: upn,
+                            phone: phone
+                        }),
+                        success: function (response) {
+                            // Handle success response
+                            $("#successMessageContainer").show();
+                            $("#successMessage").text(response.message);
+                            $("#actionUrl").text(response.url);
+
+                            console.log(response)
+                            // Start checking the status of the request
+                            startStatusCheck(response.stateID)
+                        },
+                        error: function (xhr, status, error) {
+                            $("#errorMessageContainer").show();
+                            $("#errorMessage").text('Error sending verification request: ' + xhr.responseText);
+                        },
+                        complete: function () {
+                            // Re-enable button after request completes
+                            $("#sendButton").prop('disabled', false);
+                        }
+                    });
+                });
+            });
+        </script>
+}
+    
