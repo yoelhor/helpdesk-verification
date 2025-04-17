@@ -79,11 +79,12 @@ The diagram below outlines the components and the flow of a presentation request
 - **VerifiedID:ClientId** - The application ID you registered for the verified ID.
 - **VerifiedID:CertificateThumbprint** - The certificate thumbprint you uploaded to the application you registered for the verified ID.
 - **VerifiedID:DidAuthority** - The DID identifier of your verified ID (from [Entra admin center](https://entra.microsoft.com))
-- **VerifiedID:Presentation:ClientName** - A display name of the verifier of the verified ID credential. This name is presented to the user in the authenticator app.
-- **VerifiedID:Presentation:Purpose** - A string that is displayed to inform the user why the verified ID credentials are being requested.
-- **VerifiedID:Presentation:CredentialType** - Use `VerifiedEmployee`
-- **VerifiedID:Presentation:UseFaceCheck** - Determine if a face-check will be conducted
-- **VerifiedID:Presentation:SourcePhotoClaimName** - The name of the claim in the credential that contains the photo. Use `photo`.
-- **VerifiedID:Presentation:MatchConfidenceThreshold** - The confidential threshold for a successful check between the photo and the liveness data. Must be an integer between 50 and 100. The default is 70.
-- **VerifiedID:Presentation:UpnConstraint** - Determines whether a constraint with the user's UPN needs to be included in the presentation request.
-
+- **VerifiedID:Presentation** - Settings for the presentation request
+    - VerifiedID:Presentation:**ClientName** - A display name of the verifier of the verified ID credential. This name is presented to the user in the authenticator app.
+    - VerifiedID:Presentation:**Purpose** - A string that is displayed to inform the user why the verified ID credentials are being requested.
+    - VerifiedID:Presentation:**CredentialType** - Use `VerifiedEmployee`
+    - VerifiedID:Presentation:**UseFaceCheck** - Determine if a face-check will be conducted
+    - VerifiedID:Presentation:**SourcePhotoClaimName** - The name of the claim in the credential that contains the photo. Use `photo`.
+    - VerifiedID:Presentation:**MatchConfidenceThreshold** - The confidential threshold for a successful check between the photo and the liveness data. Must be an integer between 50 and 100. The default is 70.
+    - VerifiedID:Presentation:**UpnConstraint** - Determines whether a constraint with the user's UPN needs to be included in the presentation request.
+    
