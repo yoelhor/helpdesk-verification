@@ -20,7 +20,7 @@ The diagram below outlines the components and the flow of a presentation request
         },
         "callback": {
             "url": "https://woodgrove.com/api/verifier/presentationcallback",
-            "state": "23377504-74c1-4a95-913d-86e865f71ac1",
+            "state": "11111111-0000-0000-0000-000000000000",
             "headers": {
                 "api-key": "<API key to help protect your callback API>"
             }
@@ -67,7 +67,53 @@ The diagram below outlines the components and the flow of a presentation request
     
     1. It uses in memory cache to keep state about the request. The key is the state value from the `request.Callback.State` attribute in the request. The UI will check the state when calling the [Status endpoint](./Controllers/RequestStatusController.cs).
 1. The callback endpoint is called when a user scans the QR code, uses the deep link to the Authenticator app, or finishes the presentation process. The payload contains information like the `state` value that you passed in the original payload (we use it as a key for the cache object), `requestStatus`, `claims` and more. 
-1. The **callback endpoint** updates the chache with the latest status, so the UI can check the state when calling the [Status endpoint](./Controllers/RequestStatusController.cs).
+1. The **callback endpoint** updates the chache with the latest status, so the UI can check the state when calling the [Status endpoint](./Controllers/RequestStatusController.cs). 
+    
+
+    The following JSON shows an example of **request_retrieved** status to the callback endpoint
+    
+    ```json
+    {
+        "requestId": "12345678-1234-1234-1234-000000000000",
+        "requestStatus": "request_retrieved",
+        "state": "11111111-0000-0000-0000-000000000000"
+    }
+    ```
+    
+
+    The following JSON shows an example of **presentation_verified** status to the callback endpoint
+    ```json
+    {
+        "requestId": "12345678-1234-1234-1234-000000000000",
+        "requestStatus": "presentation_verified",
+        "state": "11111111-0000-0000-0000-000000000000",
+        "verifiedCredentialsData": [
+            {
+                "issuer": "did:web:did.woodgrove.com",
+                "type": [
+                    "VerifiableCredential",
+                    "VerifiedEmployee"
+                ],
+                "claims": {
+                    "displayName": "Test user",
+                    "preferredLanguage": "en-US",
+                    "revocationId": "10@sample.co",
+                    "photo": "iVBORw0KGBCZr8J8yiLFAtu4JHpJ...."
+                },
+                "credentialState": {
+                    "revocationStatus": "VALID"
+                },
+                "domainValidation": {
+                    "url": "https://did.woodgrove.com/"
+                },
+                "expirationDate": "2025-09-15T11:29:12.000Z",
+                "issuanceDate": "2025-03-19T11:29:12.000Z"
+            }
+        ],
+        "subject": "did:ion:EiBxCxgghGgBvNEVi9E...."
+    }
+    ```
+    
 
 
 ## App settings
@@ -88,3 +134,6 @@ The diagram below outlines the components and the flow of a presentation request
     - VerifiedID:Presentation:**MatchConfidenceThreshold** - The confidential threshold for a successful check between the photo and the liveness data. Must be an integer between 50 and 100. The default is 70.
     - VerifiedID:Presentation:**UpnConstraint** - Determines whether a constraint with the user's UPN needs to be included in the presentation request.
     
+
+
+
